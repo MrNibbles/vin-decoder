@@ -49,9 +49,22 @@ public class VIN {
 
   public int getYear() {
     String yearModelCode = value.substring(9, 10);
-    int yearModelVal = VinConstants.YEAR_INDEX.get(yearModelCode);
-    yearModelVal = 1980 + (yearModelVal % 30);
-    return yearModelVal;
+    //Check position 7 to see if we are 1980-2009 or 2010-2039
+    String earlyOrLate = value.substring(6,7);
+	  int yearModelVal = VinConstants.YEAR_INDEX.get(yearModelCode);
+	
+	  //Check for 1980-2009
+    if(earlyOrLate.matches("[01234567890]") && !earlyOrLate.matches("[ABCDEFGHJKLMNPQRSTVWXY]")) {
+    	  yearModelVal = 1980 + (yearModelVal % 30);
+    	  return yearModelVal;
+    } 
+    
+    //Check for 2010-2039
+    if(!earlyOrLate.matches("[01234567890]") && earlyOrLate.matches("[ABCDEFGHJKLMNPQRSTVWXY]")) {
+    	yearModelVal = 2010 + (yearModelVal % 30);
+    	return yearModelVal;
+    }
+    throw new IllegalArgumentException("Invalid year");
   }
 
   /**
